@@ -12,10 +12,10 @@
 
 DAYS = 60
 USE_MAGNET = False
-SORT_TYPE = "rating"
-SOCKS_IP = ""
-SOCKS_PORT = 0
-HTML_SAVE_PATH = "/opt/share/www/releases.html"
+SORT_TYPE = "comboDate"
+SOCKS_IP = "127.0.0.1"
+SOCKS_PORT = 9050
+HTML_SAVE_PATH = "/var/www/movies/releases.html"
 #HTML_SAVE_PATH = r"C:\Users\Yuri\releases.html"
 
 
@@ -52,20 +52,20 @@ def digitalReleases(days):
 	currentDateReal = datetime.date.today()
 	currentDate = currentDateReal + datetime.timedelta(days=7)
 
-	print("Текущая дата (с запасом 7 дней): " + currentDate.strftime("%d.%m.%Y"))
+	print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Текущая дата (с запасом 7 дней): " + currentDate.strftime("%d.%m.%Y"))
 	downloadDates =[currentDate]
 	targetDate = datetime.date.today() - datetime.timedelta(days=days)
-	print("Целевая дата: " + targetDate.strftime("%d.%m.%Y"))
+	print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Целевая дата: " + targetDate.strftime("%d.%m.%Y"))
 	iterationDate = datetime.date.today() + datetime.timedelta(days=7)
 	
 	while (targetDate.year != iterationDate.year) or (targetDate.month != iterationDate.month):
 		iterationDate = iterationDate.replace(day=1) - datetime.timedelta(days=1)
 		downloadDates.append(iterationDate)
 	
-	print("Количество месяцев для загрузки: " + str(len(downloadDates)))
+	print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Количество месяцев для загрузки: " + str(len(downloadDates)))
 	
 	for downloadDate in downloadDates:
-		print("Загрузка релизов за " + downloadDate.strftime("%m.%Y") + ".")
+		print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Загрузка релизов за " + downloadDate.strftime("%m.%Y") + ".")
 		
 		requestMethod = KINOPOISK_API_RELEAESES.format(downloadDate.strftime("%m.%Y"), KINOPOISK_UUID)
 		timestamp = str(int(round(time.time() * 1000)))
@@ -88,7 +88,7 @@ def digitalReleases(days):
 		try:
 			response = urllib.request.urlopen(request)
 		except Exception:
-			print("Ошибка соединения при загрузке релизов за " + downloadDate.strftime("%m.%Y") + ". Даём второй шанс.")
+			print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Ошибка соединения при загрузке релизов за " + downloadDate.strftime("%m.%Y") + ". Даём второй шанс.")
 			response = urllib.request.urlopen(request)
 		
 		if response.info().get('Content-Encoding') == 'gzip':
@@ -129,7 +129,7 @@ def digitalReleases(days):
 		else:
 			raise ValueError("Ошибка загрузки релизов за " + downloadDate.strftime("%m.%Y") + ".")
 	
-	print("Загружены ID от {} релизов.".format(len(rDict)))
+	print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Загружены ID от {} релизов.".format(len(rDict)))
 	
 	for key, value in rDict.items():
 		temp = {"filmID": key, "releaseDate":value}
@@ -138,7 +138,7 @@ def digitalReleases(days):
 	return result
 
 def filmDetail(filmID):
-	print("Загрузка данных для filmID " + filmID + ".")
+	print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Загрузка данных для filmID " + filmID + ".")
 	
 	result = {}
 	
@@ -163,7 +163,7 @@ def filmDetail(filmID):
 	try:
 		response = urllib.request.urlopen(request)
 	except Exception:
-		print("Ошибка соединения при загрузке данных для filmID " + filmID + ". Даём второй шанс.")
+		print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Ошибка соединения при загрузке данных для filmID " + filmID + ". Даём второй шанс.")
 		response = urllib.request.urlopen(request)
 
 	if response.info().get('Content-Encoding') == 'gzip':
@@ -298,7 +298,7 @@ def filmDetail(filmID):
 	return result
 
 def rutorLinks(filmID):
-	print("Загрузка торрент-ссылок для filmID " + filmID + ".")
+	print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Загрузка торрент-ссылок для filmID " + filmID + ".")
 	
 	if SOCKS_IP:
 		default_socket = socket.socket
@@ -312,7 +312,7 @@ def rutorLinks(filmID):
 	try:
 		response = urllib.request.urlopen(request)
 	except Exception:
-		print("Ошибка соединения при загрузке торрент-ссылок для filmID " + filmID + ". Даём второй шанс.")
+		print(datetime.datetime.now().strftime("%d.%m.%Y %H:%M") + "Ошибка соединения при загрузке торрент-ссылок для filmID " + filmID + ". Даём второй шанс.")
 		response = urllib.request.urlopen(request)
 	if response.info().get('Content-Encoding') == 'gzip':
 		gzipFile = gzip.GzipFile(fileobj=response)
